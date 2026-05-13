@@ -6,8 +6,13 @@ negotiate: |
     semantic_context.sao_state if present).
   - Rounds remaining = payload.n_steps - payload.round.  Note this explicitly.
   CONVERGENCE RULE — you must make structural progress every round:
-  - You may NEVER send a bare reject (response=1 with outcome=null).
-    If you disagree, always include a counter-offer.
+  - Check can_counter_offer (raw payload) or the tick instruction first:
+    * If can_counter_offer is TRUE (tick says "You CAN propose a counter-offer"):
+      prefer a counter-offer over a bare reject — a bare reject is only acceptable
+      if the offer is entirely acceptable to you or you have truly no middle ground.
+    * If can_counter_offer is FALSE (tick says "You can only accept or reject"):
+      you MUST use accept or reject. Counter-offering when it is not your turn
+      is a protocol violation that stalls the session. NEVER counter in this case.
   - When counter-offering, look at payload.current_offer. Pick the one issue
     in it whose value is closest to your preference and keep it exactly as-is
     in your counter. Fight for your position on the remaining issues.
